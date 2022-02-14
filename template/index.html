@@ -29,7 +29,7 @@
                                 <h5 class="text-capitalize">Your All Todos</h5>
                                 <hr>
 
-                                <table class="table mt-2">
+                                <table class="table mt-2" id="todoList">
                                     <thead>
                                         <tr>
                                             <th scope="col" class="text-start">#</th>
@@ -37,7 +37,7 @@
                                             <th scope="col" class="text-end">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="todoList">
+                                    <tbody>
                                     </tbody>
                                 </table>
                             </div>
@@ -72,16 +72,8 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-
-        data = [
-            {
-                "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit",
-                "created": "10/12/2022",
-                "completed": "true"
-            }
-        ];
-
-
+        data = [];
+        Baseurl = 'https://todo.iqbalhasan.dev/api/'
         $(document).ready(function () {
             fetchData();
             $("form").submit(function (e) {
@@ -90,38 +82,127 @@
         });
 
         function fetchData() {
-            data.forEach(element => {
-                $("#todoList").html(
-                    "<tr>" +
-                    "<td>" +
-                    '<input class="" type="checkbox" id="" >' +
-                    "<td/>" +
-                    "<td>" +
-                    element.description +
+            $("#todoList>tbody").empty();
+            axios.get(Baseurl)
+                .then(res => {
+                    data = res.data.data;
+                    data.forEach(element => {
+                        if (element.Completed) {
+                            $("#todoList>tbody").append(
+                                "<tr>" +
+                                "<td>" +
+                                '<input class="" type="checkbox" onclick="completed(' + element.id + ')" checked>' +
+                                "<td/>" +
+                                "<td><del>" +
+                                element.Description +
+                                "<span class='badge bg-light text-dark  text-muted'>" +
+                                element.Created_by +
+                                "<span/>" +
+                                "<del/><td/>" +
+                                '<td class="text-end">' +
+                                '<button class="btn btn-primary btn-sm m-1" onclick = "edit(' + element.id + ')">Edit</button>' +
+                                '<button class= "btn btn-danger btn-sm" onclick = "delete_action(' + element.id + ')" > Delete</button > ' +
+                                '</td >' +
+                                "<tr/>"
+                            );
+                        } else {
+                            $("#todoList>tbody").append(
+                                "<tr>" +
+                                "<td>" +
+                                '<input class="" type="checkbox" onclick="completed(' + element.id + ')">' +
+                                "<td/>" +
+                                "<td>" +
+                                element.Description +
+                                "<span class='badge bg-light text-dark  text-muted'>" +
+                                element.Created_by +
+                                "<span/>" +
+                                "<td/>" +
+                                '<td class="text-end">' +
+                                '<button class="btn btn-primary btn-sm m-1" onclick = "edit(' + element.id + ')">Edit</button>' +
+                                '<button class= "btn btn-danger btn-sm" onclick = "delete_action(' + element.id + ')" > Delete</button > ' +
+                                '</td >' +
+                                "<tr/>"
+                            );
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                })
 
-                    "<span class='badge bg-light text-dark  text-muted'>" +
-                    element.created +
-                    "<span/>" +
-                    "<td/>" +
-                    '<td class="text-end">' +
-                    '<button class="btn btn-primary btn-sm m-1">Edit</button>' +
-                    '<button class= "btn btn-danger btn-sm" onclick = "delete_action(1)" > Delete</button > ' +
-
-                    '</td >' +
-                    "<tr/>"
-                );
-            })
         }
 
         function create() {
             if ($("#description").val() && $("#date").val()) {
-
-
+                axios.post(Baseurl, {
+                    "Description": $("#description").val(),
+                    "Completed": false,
+                    "Created_by": $("#date").val()
+                }).then(res => {
+                    fetchData();
+                    Swal.fire({
+                        type: "success",
+                        title: "Created !",
+                        text: "Your Todo Stored",
+                        confirmButtonClass: "btn btn-success"
+                    });
+                    $("#date").val('');
+                    $("#description").val('');
+                }).catch(err => {
+                    console.error(err);
+                })
             }
-
+        }
+        function completed(id) {
+            axios.get(Baseurl + id + '/completed/')
+                .then(res => {
+                    fetchData();
+                })
+                .catch(err => {
+                    console.error(err);
+                })
         }
 
-        function delete_action(t) {
+        function edit(id) {
+            todo = data[getKeyByValue(data, 12)];
+            Swal.fire({
+                title: 'Multiple inputs',
+                html:
+                    '<div class="mb-3 text-start">' +
+                    '<label for= "editdescription" class= "form-label" > Todo Content</label>' +
+                    '<textarea class="form-control" name="description" id="editdescription"  placeholder="Enter Todo Content">' + todo.Description + '</textarea>' +
+                    ' </div>' +
+                    ' <div class= "mb-3 text-start">' +
+                    ' <label for="editDate" class="form-label">Date</label>' +
+                    '<input type="date" class="form-control" name="date" id="editDate" value="' + todo.Created_by + '">' +
+                    '</div>',
+                focusConfirm: false,
+                preConfirm: () => {
+                    if ($("#editdescription").val() && $("#editDate").val()) {
+                        axios.put(Baseurl + todo.id + '/', {
+                            "Description": $("#editdescription").val(),
+                            "Completed": todo.Completed,
+                            "Created_by": $("#editDate").val()
+                        }).then(res => {
+                            fetchData();
+                            Swal.fire({
+                                title: "Updated !",
+                                text: "Your Todo updated",
+                                confirmButtonClass: "btn btn-success"
+                            });
+                        }).catch(err => {
+                            console.error(err);
+                        })
+                    }
+                }
+            })
+        }
+
+        function getKeyByValue(object, value) {
+            return Object.keys(object).find(key => object[key].id === value);
+        }
+
+        function delete_action(id) {
             Swal.fire({
                 title: "Are you sure?",
                 text: "You won't be able to revert this!",
@@ -134,15 +215,25 @@
                 cancelButtonClass: "btn btn-danger ml-1",
                 buttonsStyling: !1
             }).then(function (e) {
-                // e.value && ($("#delete-form").attr("action", t).submit(),
                 if (e.value) {
-
-                    Swal.fire({
-                        type: "success",
-                        title: "Deleted!",
-                        text: "Your file has been deleted.",
-                        confirmButtonClass: "btn btn-success"
-                    });
+                    axios.delete(Baseurl + id + '/')
+                        .then(res => {
+                            fetchData();
+                            Swal.fire({
+                                type: "success",
+                                title: "Deleted!",
+                                text: "Your file has been deleted.",
+                                confirmButtonClass: "btn btn-success"
+                            });
+                        }).catch(err => {
+                            console.error(err);
+                            Swal.fire({
+                                type: "error",
+                                title: "failed!",
+                                text: "Failed To create data.",
+                                confirmButtonClass: "btn btn-success"
+                            });
+                        })
                 }
             })
         };

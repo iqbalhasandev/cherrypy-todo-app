@@ -4,7 +4,7 @@
 block_cipher = None
 
 
-a = Analysis(['main.py'],
+a = Analysis(['main.py','cahcjam'],
              pathex=[],
              binaries=[],
              datas=[],

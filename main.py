@@ -1,6 +1,10 @@
+from mako.template import Template
 import cherrypy
 
-from mako.template import Template
+# cherrypy.engine.stop()
+# cherrypy.server.httpserver = None
+# cherrypy.config.update({'server.socket_port': 80})
+# cherrypy.engine.start()
 
 
 class Todo(object):
