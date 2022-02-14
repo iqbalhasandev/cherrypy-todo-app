@@ -80,7 +80,11 @@
                 e.preventDefault();
             });
         });
-
+        /**
+         * 
+         * Fetch all Data form api
+         * 
+         * */
         function fetchData() {
             $("#todoList>tbody").empty();
             axios.get(Baseurl)
@@ -132,6 +136,11 @@
 
         }
 
+        /**
+         * 
+         * For creating New Data 
+         * 
+         * */
         function create() {
             if ($("#description").val() && $("#date").val()) {
                 axios.post(Baseurl, {
@@ -153,6 +162,11 @@
                 })
             }
         }
+        /**
+         * 
+         * Mark as Completed or uncompleted
+         * 
+         * */
         function completed(id) {
             axios.get(Baseurl + id + '/completed/')
                 .then(res => {
@@ -162,7 +176,11 @@
                     console.error(err);
                 })
         }
-
+        /**
+         * 
+         * Edit Todo 
+         * 
+         * */
         function edit(id) {
             todo = data[getKeyByValue(data, 12)];
             Swal.fire({
@@ -197,11 +215,19 @@
                 }
             })
         }
-
+        /**
+         * 
+         * find key form object
+         * 
+         * */
         function getKeyByValue(object, value) {
             return Object.keys(object).find(key => object[key].id === value);
         }
-
+        /**
+         * 
+         * delete todo form API
+         *
+         * */
         function delete_action(id) {
             Swal.fire({
                 title: "Are you sure?",
