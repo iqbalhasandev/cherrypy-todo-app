@@ -1,10 +1,20 @@
 from mako.template import Template
 import cherrypy
+import webbrowser
 
-# cherrypy.engine.stop()
-# cherrypy.server.httpserver = None
-# cherrypy.config.update({'server.socket_port': 80})
-# cherrypy.engine.start()
+# cherrypy.log.screen = False
+# cherrypy.config.update({'environment': 'production'})
+
+
+class openBrowser():
+    def callbrowser(self):
+        url = 'http://127.0.0.1:8080/'
+        # Open URL in a new tab, if a browser window is already open.
+        webbrowser.open_new_tab(url)
+
+
+cherrypy.engine.openBrowser = openBrowser()
+cherrypy.engine.openBrowser.callbrowser()
 
 
 class Todo(object):
