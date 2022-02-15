@@ -1,9 +1,7 @@
 import sys
-from mako.template import Template
 from PyQt5.QtWebEngineWidgets import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -13,14 +11,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.browser)
         self.showMaximized()
 
-
-# app = QApplication(sys.argv)
-# QApplication.setApplicationName('TODO')
-# window = MainWindow()
-# window.show()
-# print('hello')
-# app.exec_()
-
-
-# if __name__ == '__main__':
-#     cherrypy.quickstart(Todo(), '/')
+app = QApplication(sys.argv)
+QApplication.setApplicationName('TODO')
+window = MainWindow()
+app.exec_()
